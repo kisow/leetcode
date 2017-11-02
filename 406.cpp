@@ -13,18 +13,12 @@ ostream& print(auto& p) {
 class Solution {
   public:
     struct Meta {
-      int sum_;
+      int h_;
       int idx_;
       int current_k_;
       Meta() {}
-      Meta(int sum, int idx, int k)
-        : sum_(sum)
-          , idx_(idx)
-          , current_k_(k)
-      {}
-
       bool operator<(auto& o) const {
-        if(current_k_ == o.current_k_) return sum_ > o.sum_;
+        if(current_k_ == o.current_k_) return h_ > o.h_;
         else return current_k_ > o.current_k_; 
       }
     };
@@ -33,30 +27,33 @@ class Solution {
       vector<Meta> metas(people.size());
 
       int i = 0;
+      int min = 0;
       for(auto& p : people) {
-        int sum = p.first + p.second;
-        metas[i].sum_ = sum;
         metas[i].idx_ = i;
+        metas[i].h_ = p.first;
         metas[i].current_k_ = p.second;
+        if(metas[min] < metas[i]) min = i;
         ++i;
       }
 
       vector<pair<int, int>> out(people.size());
 
       for(i = 0; not metas.empty(); i++) {
-        make_heap(metas.begin(), metas.end());
-        pop_heap(metas.begin(), metas.end());
-        auto p = people[metas.back().idx_];
+        auto p = people[metas[min].idx_];
+        swap(metas[min], metas.back());
+        out[i] = p;
+        metas.pop_back();
 
+        min = 0;
+        int j = 0;
         for(auto& meta : metas) {
           auto& o = people[meta.idx_];
           if(p.first >= o.first) {
-            meta.sum_--;
             meta.current_k_--;
           }
+          if(metas[min] < meta) min = j;
+          j++;
         }
-        out[i] = p;
-        metas.pop_back();
       }
 
       return move(out);
