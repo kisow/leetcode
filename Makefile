@@ -1,5 +1,5 @@
 test:
-	g++ -std=c++14 406.cpp
+	g++ -std=c++14 433.cpp
 	./a.out
 
 clean:
